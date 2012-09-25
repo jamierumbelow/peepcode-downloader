@@ -56,13 +56,16 @@ links.each do |link|
   page = link.click
 
   download_link = page.links.find { |l| l.href =~ /\.mov_z$/ }
-  screencast_name = page.search('.product_title td').children.first.text.strip
+  # don't download Peepcode product bundles
+  if page.search('.product_title td').children.any?
+    screencast_name = page.search('.product_title td').children.first.text.strip
   
-  unless File.exists?("#{path}/#{screencast_name}.zip")
-    puts "Downloading '#{screencast_name}'!"
+    unless File.exists?("#{path}/#{screencast_name}.zip")
+      puts "Downloading '#{screencast_name}'!"
 
-    agent.pluggable_parser.default = Mechanize::Download
-    agent.get(download_link.href).save("#{path}/#{screencast_name}.zip")
-    agent.pluggable_parser.default = Mechanize::File
+      agent.pluggable_parser.default = Mechanize::Download
+      agent.get(download_link.href).save("#{path}/#{screencast_name}.zip")
+      agent.pluggable_parser.default = Mechanize::File
+    end
   end
 end
